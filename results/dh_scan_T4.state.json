@@ -1,0 +1,31 @@
+{
+ "version": 1,
+ "params": {
+  "tmax": 4.0,
+  "batch": 2.0,
+  "step": 0.05,
+  "dps": 15,
+  "checkpoint_interval": 10.0,
+  "fresh": true
+ },
+ "t_done": 4.0,
+ "zeros_on_line": [],
+ "candidates_not_on_line": [],
+ "batches": [
+  {
+   "t0": 0.0,
+   "t1": 2.0,
+   "winding_raw": 0.021158421572189435,
+   "n_points": 40
+  },
+  {
+   "t0": 2.0,
+   "t1": 4.0,
+   "winding_raw": -0.13935845080424908,
+   "n_points": 41
+  }
+ ],
+ "winding_total_raw": -0.11820002923205965,
+ "finished": true,
+ "report_path": "/workspace/results/dh_scan_T4_report.json"
+}

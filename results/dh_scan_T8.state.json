@@ -1,0 +1,59 @@
+{
+ "version": 1,
+ "params": {
+  "tmax": 8.0,
+  "batch": 2.0,
+  "step": 0.05,
+  "dps": 15,
+  "checkpoint_interval": 10.0,
+  "fresh": true
+ },
+ "t_done": 8.0,
+ "zeros_on_line": [
+  5.094159844571095
+ ],
+ "candidates_not_on_line": [],
+ "batches": [
+  {
+   "t0": 0.0,
+   "t1": 2.0,
+   "winding_raw": 0.021158421572189435,
+   "n_points": 40
+  },
+  {
+   "t0": 2.0,
+   "t1": 4.0,
+   "winding_raw": -0.13935845080424908,
+   "n_points": 41
+  },
+  {
+   "t0": 4.0,
+   "t1": 6.0,
+   "winding_raw": 0.2753272528304094,
+   "n_points": 41
+  },
+  {
+   "t0": 6.0,
+   "t1": 8.0,
+   "winding_raw": -0.28003536081573815,
+   "n_points": 41
+  }
+ ],
+ "winding_total_raw": -0.12290813721738841,
+ "finished": true,
+ "accuracy_warnings": [
+  {
+   "t0": 4.0,
+   "t1": 6.0,
+   "winding_raw": 0.2753272528304094,
+   "note": "variation d'argument non proche d'un entier : step trop grand ou zero extremement proche du contour"
+  },
+  {
+   "t0": 6.0,
+   "t1": 8.0,
+   "winding_raw": -0.28003536081573815,
+   "note": "variation d'argument non proche d'un entier : step trop grand ou zero extremement proche du contour"
+  }
+ ],
+ "report_path": "/workspace/results/dh_scan_T8_report.json"
+}

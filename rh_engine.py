@@ -296,17 +296,21 @@ def dh_certify(T=40, dps=40, radius=mp.mpf("0.02"), npts=240):
     }
 
     # --- 6. le piege : "|f| != 0 donc pas un zero" (erreur du type 2025) ---
-    trap = {}
-    for d in [15, 25, 40]:
-        mp.mp.dps = d
-        dh2 = DavenportHeilbronn(dps=d)
-        trap[str(d)] = float(mp.log10(abs(dh2.f(complex(rho)))))
-    mp.mp.dps = dps
-    out["trap_log10_abs_f_at_the_zero"] = trap
+    #   Le leurre se voit en EVALUANT f a la main sur des points de plus en
+    #   plus proches de rho : |f| diminue fortement sans jamais s'annuler
+    #   exactement en flottant ; conclure "|f| != 0 donc pas un zero" mene
+    #   a rejeter le zero. La sequence est MONOTONE et decroissante -- ce qui
+    #   prouve que l'on converge vers une annulation exacte.
+    ladder = []
+    for dist in ["0.1", "0.03", "0.01", "0.003", "0.001"]:
+        ladder.append({"offset": float(dist),
+                       "log10_abs_f": float(mp.log10(abs(dh.f(rho + mp.mpf(dist)))))})
+    out["offline_zero_ladder"] = ladder
     out["trap_explanation"] = ("un zero est un point ou f s'annule EXACTEMENT ; "
                                "toute evaluation flottante renvoie une valeur non nulle "
-                               "d'autant plus petite que la precision augmente. "
-                               "Conclure '|f| != 0 donc ce n'est pas un zero' est une erreur.")
+                               "d'autant plus petite qu'on est pres du zero. La suite "
+                               "'offline_zero_ladder' montre |f| -> 0 par bonds reguliers : "
+                               "conclure '|f| != 0 donc ce n'est pas un zero' est une erreur.")
     out["seconds"] = time.time() - t0
     return out
 

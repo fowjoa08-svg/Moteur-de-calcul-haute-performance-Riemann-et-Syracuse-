@@ -1,0 +1,47 @@
+{
+ "version": 1,
+ "params": {
+  "tmax": 6.0,
+  "batch": 2.0,
+  "step": 0.05,
+  "dps": 15,
+  "checkpoint_interval": 10.0,
+  "fresh": false
+ },
+ "t_done": 6.0,
+ "zeros_on_line": [
+  5.094159844571095
+ ],
+ "candidates_not_on_line": [],
+ "batches": [
+  {
+   "t0": 0.0,
+   "t1": 2.0,
+   "winding_raw": 0.02115842157218947,
+   "n_points": 40
+  },
+  {
+   "t0": 2.0,
+   "t1": 4.0,
+   "winding_raw": -0.13473703414173496,
+   "n_points": 40
+  },
+  {
+   "t0": 4.0,
+   "t1": 6.0,
+   "winding_raw": 0.2753272528304086,
+   "n_points": 41
+  }
+ ],
+ "winding_total_raw": 0.1617486402608631,
+ "finished": true,
+ "accuracy_warnings": [
+  {
+   "t0": 4.0,
+   "t1": 6.0,
+   "winding_raw": 0.2753272528304086,
+   "note": "variation d'argument non proche d'un entier : step trop grand ou zero extremement proche du contour"
+  }
+ ],
+ "report_path": "/workspace/results/dh_scan_T6_report.json"
+}

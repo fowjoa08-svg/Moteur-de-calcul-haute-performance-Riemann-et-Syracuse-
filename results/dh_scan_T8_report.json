@@ -1,0 +1,31 @@
+{
+  "module": "dh-scan",
+  "state_version": 1,
+  "T_max": 8.0,
+  "scan_step": 0.05,
+  "dps": 15,
+  "batches_completed": 4,
+  "total_points_scanned": 163,
+  "zeros_on_line_below_T": 1,
+  "first_zeros_on_line": [
+    5.094159844571095
+  ],
+  "candidates_not_on_line": [],
+  "winding_total_raw": -0.12290813721738841,
+  "accuracy_warnings": [
+    {
+      "t0": 4.0,
+      "t1": 6.0,
+      "winding_raw": 0.2753272528304094,
+      "note": "variation d'argument non proche d'un entier : step trop grand ou zero extremement proche du contour"
+    },
+    {
+      "t0": 6.0,
+      "t1": 8.0,
+      "winding_raw": -0.28003536081573815,
+      "note": "variation d'argument non proche d'un entier : step trop grand ou zero extremement proche du contour"
+    }
+  ],
+  "finished": true,
+  "note": "verification a hauteur finie ; les zeros hors droite sont certifies par principe de l'argument (rh_engine dh_certify)"
+}
