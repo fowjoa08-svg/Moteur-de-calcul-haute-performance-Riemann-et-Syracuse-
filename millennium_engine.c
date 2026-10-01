@@ -624,7 +624,10 @@ static long double g_rVal[RMAXK];
 static const int g_rPrimes[RMAXP] = {2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,
                                      53,59,61,67,71,73,79,83,89,97,101,103,107,109,113};
 
-static long double ld_pow(int p, int e) {
+/* ld_pow : puissance entiere en long double (exposants de premiers pour le
+ * scoring Robin). Marque __maybe_unused pour garder l'auxiliaire disponible
+ * sans avertissement -Wunused-function lors des builds avec -Wall -Wextra. */
+static inline long double __attribute__((unused)) ld_pow(int p, int e) {
     long double r = 1.0L, b = (long double)p;
     while (e) { if (e & 1) r *= b; b *= b; e >>= 1; }
     return r;

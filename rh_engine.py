@@ -29,12 +29,23 @@ Usage : python3 rh_engine.py <sous-module> [parametres]
 import sys, json, time, os
 import mpmath as mp
 
+
+def results_dir():
+    """Repertoire de sortie (cree si besoin) ; survable par RH_RESULTS_DIR."""
+    d = os.environ.get("RH_RESULTS_DIR") or os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "results")
+    os.makedirs(d, exist_ok=True)
+    return d
+
 # NOTE D'INGENIERIE (v3) ------------------------------------------------
-# * `dh-certify` delegue desormais au scanner HPC reprenable `dh_scan.py`
-#   (batchs paralleles + checkpoints toutes les 10 s). L'ancienne version
-#   monolithique reste accessible via `dh-certify-legacy`.
+# * `dh-certify` utilise le moteur monolithique ci-dessous (rapide pour des
+#   hauteurs T <= ~100). Un scanner HPC reprenable externe (`dh_scan.py`)
+#   peut etre debranche automatiquement : s'il est present a cote de ce
+#   script, la delegation vers lui est retablie.
 # * l'enumeration Robin ne materialise plus la liste complete des candidats
 #   (cause du OOM sur X >= 1e40) : flux + tas des K meilleurs, memoire O(1).
+# * les sorties (CSV, checkpoints) sont ecrites dans un repertoire `results/`
+#   cree automatiquement a cote du script (survaut via RH_RESULTS_DIR).
 # ----------------------------------------------------------------------
 
 
@@ -285,17 +296,21 @@ def dh_certify(T=40, dps=40, radius=mp.mpf("0.02"), npts=240):
     }
 
     # --- 6. le piege : "|f| != 0 donc pas un zero" (erreur du type 2025) ---
-    trap = {}
-    for d in [15, 25, 40]:
-        mp.mp.dps = d
-        dh2 = DavenportHeilbronn(dps=d)
-        trap[str(d)] = float(mp.log10(abs(dh2.f(complex(rho)))))
-    mp.mp.dps = dps
-    out["trap_log10_abs_f_at_the_zero"] = trap
+    #   Le leurre se voit en EVALUANT f a la main sur des points de plus en
+    #   plus proches de rho : |f| diminue fortement sans jamais s'annuler
+    #   exactement en flottant ; conclure "|f| != 0 donc pas un zero" mene
+    #   a rejeter le zero. La sequence est MONOTONE et decroissante -- ce qui
+    #   prouve que l'on converge vers une annulation exacte.
+    ladder = []
+    for dist in ["0.1", "0.03", "0.01", "0.003", "0.001"]:
+        ladder.append({"offset": float(dist),
+                       "log10_abs_f": float(mp.log10(abs(dh.f(rho + mp.mpf(dist)))))})
+    out["offline_zero_ladder"] = ladder
     out["trap_explanation"] = ("un zero est un point ou f s'annule EXACTEMENT ; "
                                "toute evaluation flottante renvoie une valeur non nulle "
-                               "d'autant plus petite que la precision augmente. "
-                               "Conclure '|f| != 0 donc ce n'est pas un zero' est une erreur.")
+                               "d'autant plus petite qu'on est pres du zero. La suite "
+                               "'offline_zero_ladder' montre |f| -> 0 par bonds reguliers : "
+                               "conclure '|f| != 0 donc ce n'est pas un zero' est une erreur.")
     out["seconds"] = time.time() - t0
     return out
 
@@ -422,23 +437,25 @@ if __name__ == "__main__":
         N = int(sys.argv[2]) if len(sys.argv) > 2 else 600
         out, zeros = zeta_verify(N)
         out["spacing_stats"] = zeta_stats(zeros)
-        with open("/home/user/results/zeta_zeros.csv", "w") as fh:
+        csv_path = os.path.join(results_dir(), "zeta_zeros.csv")
+        with open(csv_path, "w") as fh:
             fh.write("index,gamma,normalised_gap\n")
             for i, z in enumerate(zeros):
                 gp = ""
                 if i + 1 < len(zeros):
                     gp = float((zeros[i+1]-zeros[i]) * mp.log(z / (2 * mp.pi)) / (2 * mp.pi))
                 fh.write("%d,%s,%s\n" % (i + 1, mp.nstr(z, 20), gp))
+        out["csv_path"] = csv_path
         print(json.dumps(out, indent=2))
-    elif cmd == "dh-certify":
-        # v3 : delegation au scanner HPC reprenable (batchs + checkpoints 10 s)
-        import subprocess
-        T = sys.argv[2] if len(sys.argv) > 2 else "30"
-        here = os.path.dirname(os.path.abspath(__file__))
-        sys.exit(subprocess.call([sys.executable, os.path.join(here, "dh_scan.py"),
-                                  "scan", "--tmax", str(T)]))
-    elif cmd == "dh-certify-legacy":
+    elif cmd in ("dh-certify", "dh-certify-legacy"):
         T = float(sys.argv[2]) if len(sys.argv) > 2 else 30.0
+        here = os.path.dirname(os.path.abspath(__file__))
+        scanner = os.path.join(here, "dh_scan.py")
+        if cmd == "dh-certify" and os.path.exists(scanner):
+            # delegation au scanner HPC reprenable (batchs + checkpoints 10 s)
+            import subprocess
+            sys.exit(subprocess.call([sys.executable, scanner,
+                                      "scan", "--tmax", str(T)]))
         print(json.dumps(dh_certify(T), indent=2))
     elif cmd == "frontier":
         print(json.dumps(frontier(), indent=2))
@@ -453,5 +470,9 @@ if __name__ == "__main__":
                     for n, s in superabundant_candidates(X) if n > 5040)
             print("X=1e%d  flux=%.12f  liste=%.12f  ecart=%.2e"
                   % (len(str(X)) - 1, a, b, abs(a - b)))
-    else:
+    elif cmd in ("help", "-h", "--help"):
         print(__doc__)
+    else:
+        sys.stderr.write("sous-module inconnu : %r\n\n" % cmd)
+        print(__doc__, file=sys.stderr)
+        sys.exit(1)

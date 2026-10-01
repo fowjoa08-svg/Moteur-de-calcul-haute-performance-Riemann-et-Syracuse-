@@ -1,0 +1,16 @@
+{
+  "module": "dh-scan",
+  "state_version": 1,
+  "T_max": 4.0,
+  "scan_step": 0.05,
+  "dps": 15,
+  "batches_completed": 2,
+  "total_points_scanned": 81,
+  "zeros_on_line_below_T": 0,
+  "first_zeros_on_line": [],
+  "candidates_not_on_line": [],
+  "winding_total_raw": -0.11820002923205965,
+  "accuracy_warnings": [],
+  "finished": true,
+  "note": "verification a hauteur finie ; les zeros hors droite sont certifies par principe de l'argument (rh_engine dh_certify)"
+}
